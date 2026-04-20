@@ -1,17 +1,17 @@
 import { RouterProvider } from "react-router"
 import { router } from "./app.routes.jsx"
 import { AuthProvider } from "./features/auth/auth.context.jsx"
-import React from 'react'
+import { InterviewProvider } from "./features/ai/interview.context.jsx"
 
+function App() {
 
-
-const App = () => {
   return (
     <AuthProvider>
-      <RouterProvider router={router}/>
+      <InterviewProvider>
+        <RouterProvider router={router} />
+      </InterviewProvider>
     </AuthProvider>
   )
 }
 
 export default App
-

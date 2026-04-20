@@ -48,7 +48,6 @@ export async function logout() {
 
     } catch (err) {
         console.log(err)
-
     }
 }
 
