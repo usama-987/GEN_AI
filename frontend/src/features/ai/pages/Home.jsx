@@ -3,6 +3,7 @@ import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
 import LogoutButton from '../../auth/components/logoutbutton.jsx'
+import { toast } from 'react-toastify'
 
 const Home = () => {
 
@@ -15,10 +16,23 @@ const Home = () => {
 
     const handleGenerateReport = async () => {
         const resumeFile = resumeInputRef.current.files[ 0 ]
+
+        if (!jobDescription.trim()) {
+            toast.error("Job description is required")
+            return
+        }
+
+        if (!resumeFile && !selfDescription.trim()) {
+            toast.error("Please upload a resume or add a self description")
+            return
+        }
+
         const data = await generateReport({ jobDescription, selfDescription, resumeFile })
         if (data?._id) {
             navigate(`/interview/${data._id}`)
+            return
         }
+        toast.error("Failed to generate interview strategy. Please try again.")
     }
 
     if (loading) {
