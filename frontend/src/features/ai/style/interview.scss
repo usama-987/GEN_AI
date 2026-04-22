@@ -14,9 +14,19 @@ $severity-high: #ff4d4d;
 $severity-medium: #f5a623;
 $severity-low: #3fb950;
 
-*::-webkit-scrollbar {
-    display: none;
-}
+// ── Breakpoints ───────────────────────────────────────────────────────────────
+$bp-mobile:  480px;
+$bp-tablet:  768px;
+$bp-laptop: 1024px;
+
+@mixin mobile  { @media (max-width: #{$bp-tablet - 1px})  { @content; } }
+@mixin tablet  { @media (min-width: $bp-tablet) and (max-width: #{$bp-laptop - 1px}) { @content; } }
+@mixin touch   { @media (max-width: #{$bp-laptop - 1px})  { @content; } } // mobile + tablet combined
+@mixin laptop  { @media (min-width: $bp-laptop)            { @content; } }
+@mixin xs      { @media (max-width: #{$bp-mobile - 1px})   { @content; } }
+
+// ── Scrollbar ─────────────────────────────────────────────────────────────────
+*::-webkit-scrollbar { display: none; }
 
 // ── Page Shell ────────────────────────────────────────────────────────────────
 .interview-page {
@@ -29,6 +39,9 @@ $severity-low: #3fb950;
     align-items: stretch;
     padding: 1.5rem;
     box-sizing: border-box;
+
+    @include tablet  { padding: 1rem; }
+    @include mobile  { padding: 0.5rem; }
 }
 
 // ── 3-Column Layout ───────────────────────────────────────────────────────────
@@ -41,12 +54,34 @@ $severity-low: #3fb950;
     border: 1px solid $border-color;
     border-radius: 1rem;
     justify-content: space-between;
+
+    // Tablet: hide right sidebar, keep nav
+    @include tablet {
+        border-radius: 0.75rem;
+    }
+
+    // Mobile: stack everything vertically
+    @include mobile {
+        flex-direction: column;
+        border-radius: 0.65rem;
+    }
 }
 
 .interview-divider {
     width: 1px;
     background-color: $border-color;
     flex-shrink: 0;
+
+    // Horizontal divider when stacked
+    @include mobile {
+        width: 100%;
+        height: 1px;
+
+        // Hide the vertical divider between sidebar and content on mobile
+        &:last-of-type {
+            display: none;
+        }
+    }
 }
 
 // ── Left Nav ─────────────────────────────────────────────────────────────────
@@ -59,8 +94,25 @@ $severity-low: #3fb950;
     justify-content: space-between;
     gap: 0.25rem;
 
+    // Tablet: slimmer nav
+    @include tablet {
+        width: 180px;
+        padding: 1.25rem 0.75rem;
+    }
 
-
+    // Mobile: horizontal scrollable nav bar at the top
+    @include mobile {
+        width: 100%;
+        flex-direction: row;
+        padding: 0.75rem 0.75rem 0;
+        gap: 0;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-bottom: 1px solid $border-color;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: center;
+    }
 
     &__label {
         font-size: 0.7rem;
@@ -70,6 +122,10 @@ $severity-low: #3fb950;
         color: $text-muted;
         padding: 0 0.75rem;
         margin-bottom: 0.5rem;
+
+        @include mobile {
+            display: none; // hide section label in horizontal mode
+        }
     }
 
     &__item {
@@ -97,9 +153,23 @@ $severity-low: #3fb950;
             background-color: rgba($accent, 0.1);
             color: $accent;
 
-            .interview-nav__icon svg {
-                stroke: $accent;
-            }
+            .interview-nav__icon svg { stroke: $accent; }
+        }
+
+        // Mobile: shrink to icon + short label, no forced full width
+        @include mobile {
+            width: auto;
+            flex-shrink: 0;
+            padding: 0.55rem 0.65rem;
+            font-size: 0.8rem;
+            border-radius: 0.5rem 0.5rem 0 0;
+            white-space: nowrap;
+        }
+
+        @include xs {
+            gap: 0.35rem;
+            padding: 0.5rem 0.5rem;
+            font-size: 0.75rem;
         }
     }
 
@@ -107,6 +177,10 @@ $severity-low: #3fb950;
         display: flex;
         align-items: center;
         flex-shrink: 0;
+
+        @include mobile {
+            svg { width: 14px; height: 14px; }
+        }
     }
 }
 
@@ -120,16 +194,22 @@ $severity-low: #3fb950;
     padding-bottom: 5rem;
     align-items: flex-start;
 
-
-
-
-
-
-
-
-    section {
-        min-height: 100%;
+    @include tablet {
+        padding: 1.25rem 1.5rem 4rem;
+        max-height: calc(100vh - 2rem);
     }
+
+    @include mobile {
+        padding: 1rem 0.9rem 4rem;
+        max-height: none; // let mobile scroll naturally
+        overflow-y: visible;
+    }
+
+    @include xs {
+        padding: 0.75rem 0.65rem 3rem;
+    }
+
+    section { min-height: 100%; }
 }
 
 .content-header {
@@ -145,6 +225,9 @@ $severity-low: #3fb950;
         font-weight: 700;
         color: $text-primary;
         margin: 0;
+
+        @include mobile { font-size: 1rem; }
+        @include xs     { font-size: 0.9rem; }
     }
 
     &__count {
@@ -154,6 +237,8 @@ $severity-low: #3fb950;
         padding: 0.15rem 0.6rem;
         border-radius: 2rem;
         border: 1px solid $border-color;
+
+        @include mobile { font-size: 0.72rem; }
     }
 }
 
@@ -162,6 +247,8 @@ $severity-low: #3fb950;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+
+    @include mobile { gap: 0.6rem; }
 }
 
 .q-card {
@@ -171,9 +258,7 @@ $severity-low: #3fb950;
     overflow: hidden;
     transition: border-color 0.2s;
 
-    &:hover {
-        border-color: lighten($border-color, 8%);
-    }
+    &:hover { border-color: lighten($border-color, 8%); }
 
     &__header {
         display: flex;
@@ -182,6 +267,9 @@ $severity-low: #3fb950;
         padding: 0.9rem 1rem;
         cursor: pointer;
         user-select: none;
+
+        @include mobile { padding: 0.75rem 0.75rem; gap: 0.6rem; }
+        @include xs     { padding: 0.65rem 0.6rem;  gap: 0.5rem; }
     }
 
     &__index {
@@ -194,6 +282,8 @@ $severity-low: #3fb950;
         border-radius: 0.3rem;
         padding: 0.15rem 0.4rem;
         margin-top: 2px;
+
+        @include xs { font-size: 0.65rem; }
     }
 
     &__question {
@@ -203,6 +293,9 @@ $severity-low: #3fb950;
         font-weight: 500;
         color: $text-primary;
         line-height: 1.5;
+
+        @include mobile { font-size: 0.845rem; }
+        @include xs     { font-size: 0.8rem; }
     }
 
     &__chevron {
@@ -224,6 +317,9 @@ $severity-low: #3fb950;
         gap: 0.75rem;
         border-top: 1px solid $border-color;
         padding-top: 0.75rem;
+
+        @include mobile { padding: 0 0.75rem 0.75rem; padding-top: 0.65rem; }
+        @include xs     { padding: 0 0.6rem  0.65rem; padding-top: 0.6rem;  }
     }
 
     &__section {
@@ -236,6 +332,9 @@ $severity-low: #3fb950;
             font-size: 0.835rem;
             color: lighten($text-muted, 15%);
             line-height: 1.6;
+
+            @include mobile { font-size: 0.8rem; }
+            @include xs     { font-size: 0.775rem; }
         }
     }
 
@@ -269,7 +368,6 @@ $severity-low: #3fb950;
     gap: 0;
     position: relative;
 
-    // vertical timeline line
     &::before {
         content: '';
         position: absolute;
@@ -279,6 +377,9 @@ $severity-low: #3fb950;
         width: 2px;
         background: linear-gradient(to bottom, $accent, rgba($accent, 0.1));
         border-radius: 1px;
+
+        @include mobile { left: 20px; }
+        @include xs     { left: 16px; }
     }
 }
 
@@ -289,7 +390,9 @@ $severity-low: #3fb950;
     padding: 0.75rem 0 0.75rem 3.5rem;
     position: relative;
 
-    // dot on timeline
+    @include mobile { padding: 0.65rem 0 0.65rem 2.75rem; }
+    @include xs     { padding: 0.6rem  0 0.6rem  2.25rem; }
+
     &::before {
         content: '';
         position: absolute;
@@ -300,12 +403,17 @@ $severity-low: #3fb950;
         border-radius: 50%;
         background-color: $bg-card;
         border: 2px solid $accent;
+
+        @include mobile { left: 13px; width: 12px; height: 12px; }
+        @include xs     { left: 10px; width: 10px; height: 10px; }
     }
 
     &__header {
         display: flex;
         align-items: center;
         gap: 0.6rem;
+
+        @include xs { gap: 0.4rem; }
     }
 
     &__badge {
@@ -316,6 +424,8 @@ $severity-low: #3fb950;
         border: 1px solid rgba($accent, 0.25);
         padding: 0.1rem 0.5rem;
         border-radius: 2rem;
+
+        @include xs { font-size: 0.65rem; padding: 0.1rem 0.4rem; }
     }
 
     &__focus {
@@ -323,6 +433,9 @@ $severity-low: #3fb950;
         font-size: 0.95rem;
         font-weight: 600;
         color: $text-primary;
+
+        @include mobile { font-size: 0.875rem; }
+        @include xs     { font-size: 0.825rem; }
     }
 
     &__tasks {
@@ -340,6 +453,9 @@ $severity-low: #3fb950;
             font-size: 0.845rem;
             color: lighten($text-muted, 12%);
             line-height: 1.5;
+
+            @include mobile { font-size: 0.8rem; }
+            @include xs     { font-size: 0.77rem; }
         }
     }
 
@@ -361,11 +477,37 @@ $severity-low: #3fb950;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+
+    // Tablet: slightly narrower
+    @include tablet {
+        width: 200px;
+        padding: 1.25rem 1rem;
+        gap: 1rem;
+    }
+
+    // Mobile: full-width horizontal strip below content
+    @include mobile {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 1rem 0.9rem;
+        gap: 1rem;
+        border-top: 1px solid $border-color;
+        align-items: flex-start;
+    }
+
+    @include xs {
+        padding: 0.75rem 0.65rem;
+        gap: 0.75rem;
+    }
 }
 
 .sidebar-divider {
     height: 1px;
     background-color: $border-color;
+
+    // Hide internal dividers in horizontal mobile layout
+    @include mobile { display: none; }
 }
 
 // Match Score
@@ -375,6 +517,12 @@ $severity-low: #3fb950;
     align-items: center;
     gap: 0.6rem;
 
+    // On mobile, take up ~half the strip
+    @include mobile {
+        flex: 1 1 130px;
+        align-items: flex-start;
+    }
+
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
@@ -383,6 +531,8 @@ $severity-low: #3fb950;
         color: $text-muted;
         margin: 0;
         align-self: flex-start;
+
+        @include xs { font-size: 0.68rem; }
     }
 
     &__ring {
@@ -395,17 +545,13 @@ $severity-low: #3fb950;
         justify-content: center;
         border: 4px solid;
 
-        &.score--high {
-            border-color: $severity-low;
-        }
+        @include tablet { width: 80px; height: 80px; }
+        @include mobile { width: 72px; height: 72px; }
+        @include xs     { width: 64px; height: 64px; }
 
-        &.score--mid {
-            border-color: $severity-medium;
-        }
-
-        &.score--low {
-            border-color: $severity-high;
-        }
+        &.score--high   { border-color: $severity-low;    }
+        &.score--mid    { border-color: $severity-medium;  }
+        &.score--low    { border-color: $severity-high;    }
     }
 
     &__value {
@@ -413,12 +559,17 @@ $severity-low: #3fb950;
         font-weight: 800;
         color: $text-primary;
         line-height: 1;
+
+        @include mobile { font-size: 1.35rem; }
+        @include xs     { font-size: 1.15rem; }
     }
 
     &__pct {
         font-size: 0.75rem;
         color: $text-muted;
         margin-top: -2px;
+
+        @include xs { font-size: 0.68rem; }
     }
 
     &__sub {
@@ -426,6 +577,9 @@ $severity-low: #3fb950;
         font-size: 0.75rem;
         color: $severity-low;
         text-align: center;
+
+        @include mobile { text-align: left; }
+        @include xs     { font-size: 0.7rem; }
     }
 }
 
@@ -435,6 +589,12 @@ $severity-low: #3fb950;
     flex-direction: column;
     gap: 0.75rem;
 
+    // On mobile, fill remaining strip space
+    @include mobile {
+        flex: 1 1 160px;
+        gap: 0.5rem;
+    }
+
     &__label {
         font-size: 0.75rem;
         font-weight: 600;
@@ -442,12 +602,16 @@ $severity-low: #3fb950;
         letter-spacing: 0.08em;
         color: $text-muted;
         margin: 0;
+
+        @include xs { font-size: 0.68rem; }
     }
 
     &__list {
         display: flex;
         flex-wrap: wrap;
         gap: 0.5rem;
+
+        @include xs { gap: 0.4rem; }
     }
 }
 
@@ -459,21 +623,10 @@ $severity-low: #3fb950;
     border: 1px solid;
     cursor: default;
 
-    &--high {
-        color: $severity-high;
-        background-color: rgba($severity-high, 0.1);
-        border-color: rgba($severity-high, 0.25);
-    }
+    @include mobile { font-size: 0.72rem;  padding: 0.25rem 0.6rem; }
+    @include xs     { font-size: 0.68rem;  padding: 0.2rem  0.5rem; }
 
-    &--medium {
-        color: $severity-medium;
-        background-color: rgba($severity-medium, 0.1);
-        border-color: rgba($severity-medium, 0.25);
-    }
-
-    &--low {
-        color: $severity-low;
-        background-color: rgba($severity-low, 0.1);
-        border-color: rgba($severity-low, 0.25);
-    }
+    &--high   { color: $severity-high;   background-color: rgba($severity-high,   0.1); border-color: rgba($severity-high,   0.25); }
+    &--medium { color: $severity-medium; background-color: rgba($severity-medium, 0.1); border-color: rgba($severity-medium, 0.25); }
+    &--low    { color: $severity-low;    background-color: rgba($severity-low,    0.1); border-color: rgba($severity-low,    0.25); }
 }

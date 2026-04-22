@@ -163,7 +163,7 @@ async function generateInterviewReport({ resume, selfDescription, jobDescription
                         - Include these keys exactly: matchScore, technicalQuestions, behavioralQuestions, skillGaps, preparationPlan, title.
                         - technicalQuestions must contain at least 5 items.
                         - behavioralQuestions must contain at least 5 items.
-                        - skillGaps must contain at least 3 items.
+                        - skillGaps must contain at least 5 items.
                         - preparationPlan must contain exactly 7 items for day 1..7.
                         - Each preparationPlan.tasks must contain at least 2 tasks.
 `

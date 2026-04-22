@@ -11,34 +11,34 @@ export const useAuth = () => {
 
 
     const handleLogin = async ({ email, password }) => {
-        setLoading(true)
-        try {
-            const data = await login({ email, password })
-            if (!data?.user) {
-                return false
-            }
-            setUser(data.user)
-            return true
-        } catch (err) {
-            console.log(err)
-            return false
-        } finally {
-            setLoading(false)
+    setLoading(true)
+    try {
+        const data = await login({ email, password })
+        if (!data?.user) {
+            return { success: false, message: "Invalid email or password" }
         }
+        setUser(data.user)
+        return { success: true }
+    } catch (err) {
+        const message = err.response?.data?.message || "Login failed"
+        return { success: false, message }
+    } finally {
+        setLoading(false)
     }
+}
 
     const handleRegister = async ({ username, email, password }) => {
-        setLoading(true)
-        try {
-            await register({ username, email, password })
-            return true
-        } catch (err) {
-            console.log(err)
-            return false
-        } finally {
-            setLoading(false)
-        }
+    setLoading(true)
+    try {
+        await register({ username, email, password })
+        return { success: true }
+    } catch (err) {
+        const message = err.response?.data?.message || "Registration failed"
+        return { success: false, message }
+    } finally {
+        setLoading(false)
     }
+}
 
     const handleLogout = async () => {
         setLoading(true)
